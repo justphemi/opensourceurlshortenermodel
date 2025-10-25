@@ -5,12 +5,12 @@ export interface CountryData {
 
 export const getCountry = async (): Promise<CountryData> => {
   try {
-    const response = await fetch('http://ip-api.com/json');
+    const response = await fetch('https://ipapi.co/json');
     const data = await response.json();
     console.log(data)
     return {
-      country: data.country || 'Unknown',
-      countryCode: data.countryCode || 'XX'
+      country: data.country || 'Nigeria',
+      countryCode: data.country_code || 'NG'
     };
   } catch (error) {
     console.error('Error fetching country:', error);
