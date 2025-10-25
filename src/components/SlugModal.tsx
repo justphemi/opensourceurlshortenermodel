@@ -63,7 +63,7 @@ const SlugModal = ({ isOpen, onClose, onBack, onShorten }: SlugModalProps) => {
   return (
     <PixelModal isOpen={isOpen} onClose={onClose} title="Choose your custom slug">
       <div className="space-y-6">
-        <div className="flex items-center pixel-gap">
+        <div className="flex flex-col items-center pixel-gap">
           <span className="font-pixel text-[9px] text-muted-foreground">
             {window.location.origin}/
           </span>
