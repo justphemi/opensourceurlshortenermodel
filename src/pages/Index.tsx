@@ -187,7 +187,7 @@ const Index = () => {
        <div className="text-center space-y-4 px-4">
   {/* Title */}
   <h1 className="font-pixel text-lg sm:text-xl md:text-2xl lg:text-3xl uppercase text-primary leading-tight">
-    Open Source Link Shortener Model
+    Open Source Link Shortener 
   </h1>
 
   {/* Version & GitHub Link */}
