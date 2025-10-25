@@ -46,6 +46,7 @@ const Index = () => {
   const [editingLink, setEditingLink] = useState<LinkData | null>(null);
   
   const deviceId = getDeviceId();
+  console.log(deviceId);
   
   const fetchLinks = async () => {
     setLoading(true);
@@ -53,14 +54,22 @@ const Index = () => {
       const fetchedLinks = showOnlyMyLinks 
         ? await getUserLinks(deviceId)
         : await getAllLinks();
-      setLinks(fetchedLinks);
+      
+      // Set links even if empty array
+      setLinks(fetchedLinks || []);
       setCurrentPage(1);
       
       const count = await getUniqueUsersCount();
       setUniqueUsers(count);
     } catch (error) {
       console.error("Error fetching links:", error);
-      toast.error("Failed to load links");
+      // Don't show error toast for empty results
+      // Only show error for actual failures
+      if (error instanceof Error && !error.message.includes("empty")) {
+        toast.error("Failed to load links");
+      }
+      // Set empty array on error
+      setLinks([]);
     } finally {
       setLoading(false);
     }
@@ -68,7 +77,7 @@ const Index = () => {
   
   useEffect(() => {
     fetchLinks();
-  }, [showOnlyMyLinks]);
+  }, [showOnlyMyLinks, deviceId]);
   
   const validateUrl = (url: string): boolean => {
     try {
@@ -184,34 +193,34 @@ const Index = () => {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Logo & Title */}
-       <div className="text-center space-y-4 px-4">
-  {/* Title */}
-  <h1 className="font-pixel text-lg sm:text-xl md:text-2xl lg:text-3xl uppercase text-primary leading-tight">
-    Open Source Link Shortener 
-  </h1>
+        <div className="text-center space-y-4 px-4">
+          {/* Title */}
+          <h1 className="font-pixel text-lg sm:text-xl md:text-2xl lg:text-3xl uppercase text-primary leading-tight">
+            Open Source Link Shortener 
+          </h1>
 
-  {/* Version & GitHub Link */}
-  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-    <p className="font-pixel text-[9px] sm:text-xs uppercase text-muted-foreground">
-      V 1.0.0
-    </p>
-    
-    <a 
-      href="https://github.com/justphemi/opensourceurlshortenermodel" 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="flex items-center gap-2 font-pixel text-[9px] sm:text-xs text-primary hover:text-primary/80 transition-colors"
-    >
-      <Github className="w-4 h-4 sm:w-5 sm:h-5" />
-      <span>@justphemi</span>
-    </a>
-  </div>
+          {/* Version & GitHub Link */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+            <p className="font-pixel text-[9px] sm:text-xs uppercase text-muted-foreground">
+              V 1.0.0
+            </p>
+            
+            <a 
+              href="https://github.com/justphemi/opensourceurlshortenermodel" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 font-pixel text-[9px] sm:text-xs text-primary hover:text-primary/80 transition-colors"
+            >
+              <Github className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>@justphemi</span>
+            </a>
+          </div>
 
-  {/* User Badge */}
-  <div className="flex justify-center">
-    <PixelBadge>{uniqueUsers} Users</PixelBadge>
-  </div>
-</div>
+          {/* User Badge */}
+          <div className="flex justify-center">
+            <PixelBadge>{uniqueUsers} Users</PixelBadge>
+          </div>
+        </div>
         
         {/* URL Input */}
         <div className="space-y-4">
@@ -240,7 +249,26 @@ const Index = () => {
         {/* Links Table */}
         {loading ? (
           <div className="text-center py-12">
-            <p className="font-pixel text-[9px] text-muted-foreground">Loading...</p>
+            <p className="font-pixel text-[10px] text-muted-foreground animate-pulse">
+              Loading...
+            </p>
+          </div>
+        ) : links.length === 0 ? (
+          <div className="pixel-border bg-background p-12 text-center">
+            <p className="font-pixel text-[10px] text-muted-foreground mb-4">
+              {showOnlyMyLinks 
+                ? "You don't have any links yet. Create your first one!" 
+                : "No links yet. Be the first to create one!"}
+            </p>
+            {showOnlyMyLinks && (
+              <PixelButton 
+                onClick={() => setShowOnlyMyLinks(false)}
+                variant="secondary"
+                className="mt-4"
+              >
+                View All Links
+              </PixelButton>
+            )}
           </div>
         ) : (
           <LinksTable
